@@ -10,41 +10,55 @@ from tqdm import tqdm
 
 SIZE = (1024, 1024)
 
+dataset_configurations = {
+    "RIM_ONE": {
+        "healthy": {
+            "images": "healthy/stereo images/*.jpg",
+            "cup_masks": "healthy/average_masks/*Cup*.png",
+            "disc_masks": "healthy/average_masks/*Disc*.png"
+        },
+        "glaucoma": {
+            "images": "Glaucoma and suspects/stereo images/*.jpg",
+            "cup_masks": "Glaucoma and suspects/average_masks/*Cup*.png",
+            "disc_masks": "Glaucoma and suspects/average_masks/*Disc*.png"
+        }
+    },
+    "DRISHTI_GS": {
+        "healthy": {
+            "images": "normal/images/*.png",
+            "cup_masks": "normal/GT/*/SoftMap/*cup*.png",
+            "disc_masks": "normal/GT/*/SoftMap/*OD*.png"
+        },
+        "glaucoma": {
+            "images": "glaucoma/images/*.png",
+            "cup_masks": "glaucoma/GT/*/SoftMap/*cup*.png",
+            "disc_masks": "glaucoma/GT/*/SoftMap/*OD*.png"
+        }
+    }
+}
+
 
 def create_directories(data_dir):
-    for subdir in ["train/normal/image", "train/glaucoma/image",
-                   "train/normal/mask/cup", "train/glaucoma/mask/cup",
-                   "train/normal/mask/disc", "train/glaucoma/mask/disc",
-                   "test/normal/image", "test/glaucoma/image",
-                   "test/normal/mask/cup", "test/glaucoma/mask/cup",
-                   "test/normal/mask/disc", "test/glaucoma/mask/disc"]:
-        (Path(data_dir) / subdir).mkdir(parents=True, exist_ok=True)
+    categories = ['normal', 'glaucoma']
+    types = ['image', 'mask/cup', 'mask/disc']
+    phases = ['train', 'test']
+
+    for phase in phases:
+        for category in categories:
+            for dtype in types:
+                subdir = f"{phase}/{category}/{dtype}"
+                (Path(data_dir) / subdir).mkdir(parents=True, exist_ok=True)
 
 
-def load_rim_one_data(path):
-    h_images = sorted(glob(os.path.join(path, "healthy", "stereo images", "*.jpg")))
-    h_cup_masks = sorted(glob(os.path.join(path, "healthy", "average_masks", "*Cup*.png")))
-    h_disc_masks = sorted(glob(os.path.join(path, "healthy", "average_masks", "*Disc*.png")))
-
-    g_images = sorted(glob(os.path.join(path, "Glaucoma and suspects", "stereo images", "*.jpg")))
-    g_cup_masks = sorted(glob(os.path.join(path, "Glaucoma and suspects", "average_masks", "*Cup*.png")))
-    g_disc_masks = sorted(glob(os.path.join(path, "Glaucoma and suspects", "average_masks", "*Disc*.png")))
-
-    return ((h_images, h_cup_masks, h_disc_masks),
-            (g_images, g_cup_masks, g_disc_masks))
-
-
-def load_drishti_gs_data(path):
-    h_images = sorted(glob(os.path.join(path, "normal", "images", "*.png")))
-    h_cup_masks = sorted(glob(os.path.join(path, "normal", "GT", "*", "SoftMap", "*cup*.png")))
-    h_disc_masks = sorted(glob(os.path.join(path, "normal", "GT", "*", "SoftMap", "*OD*.png")))
-
-    g_images = sorted(glob(os.path.join(path, "glaucoma", "images", "*.png")))
-    g_cup_masks = sorted(glob(os.path.join(path, "glaucoma", "GT", "*", "SoftMap", "*cup*.png")))
-    g_disc_masks = sorted(glob(os.path.join(path, "glaucoma", "GT", "*", "SoftMap", "*OD*.png")))
-
-    return ((h_images, h_cup_masks, h_disc_masks),
-            (g_images, g_cup_masks, g_disc_masks))
+def load_data(path, config):
+    results = []
+    for condition in ['healthy', 'glaucoma']:
+        paths = config[condition]
+        images = sorted(glob(os.path.join(path, paths["images"])))
+        cup_masks = sorted(glob(os.path.join(path, paths["cup_masks"])))
+        disc_masks = sorted(glob(os.path.join(path, paths["disc_masks"])))
+        results.append((images, cup_masks, disc_masks))
+    return tuple(results)
 
 
 def resize_data(images, cup_masks, disc_masks, save_path):
@@ -79,8 +93,6 @@ def split_data(images, cup_masks, disc_masks, test_size=0.2, random_state=None):
 
 
 def handle_data(images, cup_masks, disc_masks, directory_path, folder):
-    create_directories(directory_path)
-
     ((train_images, train_cup_masks, train_disc_masks),
      (test_images, test_cup_masks, test_disc_masks)) = split_data(images, cup_masks, disc_masks)
     print(f"Train images: {len(train_images)} - Test images: {len(test_images)} for {directory_path} {folder}")
@@ -89,26 +101,31 @@ def handle_data(images, cup_masks, disc_masks, directory_path, folder):
     resize_data(test_images, test_cup_masks, test_disc_masks, str(directory_path + "/test/" + folder))
 
 
-def load_data():
-    """ Load the data RIM ONE """
-    rim_one_data_path = r"D:\licenta\datasets\RIM-ONE r3 - Copy"
-    ((healthy_images, healthy_cup_masks, healthy_disc_masks),
-     (glaucoma_images, glaucoma_cup_masks, glaucoma_disc_masks)) = load_rim_one_data(rim_one_data_path)
+def define_dataset():
+    datasets_info = [
+        {
+            "data_path": r"D:\licenta\datasets\RIM-ONE r3 - Copy",
+            "config": dataset_configurations["RIM_ONE"],
+            "output_dir": "../data/rim_one_r3"
+        },
+        {
+            "data_path": r"D:\licenta\datasets\Drishti-GS - Copy",
+            "config": dataset_configurations["DRISHTI_GS"],
+            "output_dir": "../data/drishti-GS"
+        }
+    ]
 
-    handle_data(healthy_images, healthy_cup_masks, healthy_disc_masks, "../data/rim_one_r3", "normal")
-    handle_data(glaucoma_images, glaucoma_cup_masks, glaucoma_disc_masks, "../data/rim_one_r3", "glaucoma")
+    for dataset in datasets_info:
+        data_path, config, output_dir = dataset.values()
+        (hi, hc, hd), (gi, gc, gd) = load_data(data_path, config)
 
-    """ Load the data DRISHTI """
-    drishti_data_path = r"D:\licenta\datasets\Drishti-GS - Copy"
-    ((healthy_images, healthy_cup_masks, healthy_disc_masks),
-     (glaucoma_images, glaucoma_cup_masks, glaucoma_disc_masks)) = load_drishti_gs_data(drishti_data_path)
-
-    handle_data(healthy_images, healthy_cup_masks, healthy_disc_masks, "../data/drishti-GS", "normal")
-    handle_data(glaucoma_images, glaucoma_cup_masks, glaucoma_disc_masks, "../data/drishti-GS", "glaucoma")
+        create_directories(output_dir)
+        handle_data(hi, hc, hd, output_dir, "normal")
+        handle_data(gi, gc, gd, output_dir, "glaucoma")
 
 
 if __name__ == "__main__":
     """ Seeding """
     np.random.seed(42)
 
-    load_data()
+    define_dataset()
