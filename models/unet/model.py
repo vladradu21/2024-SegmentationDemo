@@ -49,7 +49,7 @@ class decoder_block(nn.Module):
 
     def forward(self, inputs, skip):
         x = self.up(inputs)
-        x = torch.cat([x, skip], axis=1)
+        x = torch.cat([x, skip], dim=1)
         x = self.conv(x)
 
         return x
@@ -74,6 +74,9 @@ class build_unet(nn.Module):
         self.d3 = decoder_block(256, 128)
         self.d4 = decoder_block(128, 64)
 
+        """ Classifier """
+        self.outputs = nn.Conv2d(64, 1, kernel_size=1, padding=0)
+
     def forward(self, inputs):
         """ Encoder """
         s1, p1 = self.e1(inputs)
@@ -90,8 +93,13 @@ class build_unet(nn.Module):
         d3 = self.d3(d2, s2)
         d4 = self.d4(d3, s1)
 
+        outputs = self.outputs(d4)
+
+        return outputs
+
 
 if __name__ == "__main__":
     x = torch.randn((2, 3, 512, 512))
     f = build_unet()
-    f(x)
+    y = f(x)
+    print(y.shape)
