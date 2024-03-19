@@ -54,8 +54,8 @@ if __name__ == '__main__':
     create_dir("files")
 
     """ Load dataset """
-    train_x = glob("../../data/drishti-GS/train/*/image/*.png")[:20]
-    train_y = glob("../../data/drishti-GS/train/*/mask/cup/*.png")[:20]
+    train_x = glob("../../data/drishti-GS/train/*/image/*.png")
+    train_y = glob("../../data/drishti-GS/train/*/mask/cup/*.png")
 
     valid_x = glob("../../data/drishti-GS/test/*/image/*.png")
     valid_y = glob("../../data/drishti-GS/test/*/mask/cup/*.png")

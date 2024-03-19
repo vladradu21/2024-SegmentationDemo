@@ -48,8 +48,8 @@ if __name__ == '__main__':
     create_dir('results')
 
     """ Load dataset """
-    test_x = glob("../../data/drishti-GS/test/*/image/*.png")[:20]
-    test_y = glob("../../data/drishti-GS/test/*/mask/cup/*.png")[:20]
+    test_x = glob("../../data/drishti-GS/test/*/image/*.png")
+    test_y = glob("../../data/drishti-GS/test/*/mask/cup/*.png")
 
     """ Hyperparameters """
     H = 512
