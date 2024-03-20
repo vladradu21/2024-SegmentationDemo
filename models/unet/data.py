@@ -14,14 +14,14 @@ class DriveDataset(Dataset):
         """ Read image """
         image = cv2.imread(self.images_path[index], cv2.IMREAD_COLOR)
         image = image / 255.0  # normalize
-        image = np.transpose(image, (2, 0, 1))  # transpose (3, 512, 512)
+        image = np.transpose(image, (2, 0, 1))  # transpose (3, 1024, 1024)
         image = image.astype(np.float32)
         image = torch.from_numpy(image)
 
         """ Read mask """
         mask = cv2.imread(self.masks_path[index], cv2.IMREAD_GRAYSCALE)
         mask = mask / 255.0  # normalize
-        mask = np.expand_dims(mask, axis=0)  # (1, 512, 512)
+        mask = np.expand_dims(mask, axis=0)  # (1, 1024, 1024)
         mask = mask.astype(np.float32)
         mask = torch.from_numpy(mask)
 
