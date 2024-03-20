@@ -35,8 +35,8 @@ def calculate_metrics(y_true, pred_y):
 
 
 def mask_parse(mask):
-    mask = np.expand_dims(mask, axis=-1)  # (512, 512, 1)
-    mask = np.concatenate([mask, mask, mask], axis=-1)  # (512, 512, 3)
+    mask = np.expand_dims(mask, axis=-1)  # (1024, 1024, 1)
+    mask = np.concatenate([mask, mask, mask], axis=-1)  # (1024, 1024, 3)
     return mask
 
 
@@ -52,8 +52,8 @@ if __name__ == '__main__':
     test_y = glob("../../data/drishti-GS/test/*/mask/cup/*.png")
 
     """ Hyperparameters """
-    H = 512
-    W = 512
+    H = 1024
+    W = 1024
     size = (H, W)
     checkpoint_path = "files/checkpoint.pth"
 
@@ -73,19 +73,19 @@ if __name__ == '__main__':
         name = y.split('\\')[-1].split('.')[0]
 
         """ Read the images """
-        image = cv2.imread(x, cv2.IMREAD_COLOR)  # (512, 512, 3)
-        x = np.transpose(image, (2, 0, 1))  # (3, 512, 512)
+        image = cv2.imread(x, cv2.IMREAD_COLOR)  # (1024, 1024, 3)
+        x = np.transpose(image, (2, 0, 1))  # (3, 1024, 1024)
         x = x / 255.0
-        x = np.expand_dims(x, axis=0)  # (1, 3, 512, 512) batch of 1 image
+        x = np.expand_dims(x, axis=0)  # (1, 3, 1024, 1024) batch of 1 image
         x = x.astype(np.float32)
         x = torch.from_numpy(x)
         x = x.to(device)
 
         """ Read the masks """
-        mask = cv2.imread(y, cv2.IMREAD_GRAYSCALE)  # (512, 512)
-        y = np.expand_dims(mask, axis=0)  # (1, 512, 512)
+        mask = cv2.imread(y, cv2.IMREAD_GRAYSCALE)  # (1024, 1024)
+        y = np.expand_dims(mask, axis=0)  # (1, 1024, 1024)
         y = y / 255.0
-        y = np.expand_dims(y, axis=0)  # (1, 1, 512, 512)
+        y = np.expand_dims(y, axis=0)  # (1, 1, 1024, 1024)
         y = y.astype(np.float32)
         y = torch.from_numpy(y)
         y = y.to(device)
@@ -101,8 +101,8 @@ if __name__ == '__main__':
             score = calculate_metrics(y, pred_y)
             metrics_score = list(map(add, metrics_score, score))
 
-            pred_y = pred_y[0].cpu().numpy()  # (1, 512, 512)
-            pred_y = np.squeeze(pred_y, axis=0)  # (512, 512)
+            pred_y = pred_y[0].cpu().numpy()  # (1, 1024, 1024)
+            pred_y = np.squeeze(pred_y, axis=0)  # (1024, 1024)
             pred_y = pred_y > 0.5
             pred_y = np.array(pred_y, dtype=np.uint8)
 

@@ -8,8 +8,8 @@ from model import build_unet
 
 
 def mask_parse(mask):
-    mask = np.expand_dims(mask, axis=-1)  # (512, 512, 1)
-    mask = np.concatenate([mask, mask, mask], axis=-1)  # (512, 512, 3)
+    mask = np.expand_dims(mask, axis=-1)  # (1024, 1024, 1)
+    mask = np.concatenate([mask, mask, mask], axis=-1)  # (1024, 1024, 3)
     return mask
 
 
@@ -18,7 +18,7 @@ if __name__ == '__main__':
     image_path = '../../data/predict/image/fundus.png'
     image_name = os.path.splitext(os.path.basename(image_path))[0]  # base name of the file without extension
     image = cv2.imread(image_path, cv2.IMREAD_COLOR)
-    image = cv2.resize(image, (512, 512))  # Resize if necessary
+    image = cv2.resize(image, (1024, 1024))  # Resize if necessary
     x = np.transpose(image, (2, 0, 1))
     x = x / 255.0
     x = np.expand_dims(x, axis=0)

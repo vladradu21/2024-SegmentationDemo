@@ -63,8 +63,8 @@ if __name__ == '__main__':
     print(f"Train images: {len(train_x)} - Test images {len(valid_x)}")
 
     """ Hyperparameters """
-    H = 512
-    W = 512
+    H = 1024
+    W = 1024
     size = (H, W)
     batch_size = 2
     num_epochs = 50
