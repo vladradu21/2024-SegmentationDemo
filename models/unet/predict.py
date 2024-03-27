@@ -15,7 +15,7 @@ def mask_parse(mask):
 
 if __name__ == '__main__':
     """ Load the image """
-    image_path = '../../data/predict/image/fundus.png'
+    image_path = '../../out/predict/image/fundus.png'
     image_name = os.path.splitext(os.path.basename(image_path))[0]  # base name of the file without extension
     image = cv2.imread(image_path, cv2.IMREAD_COLOR)
     image = cv2.resize(image, (1024, 1024))  # Resize if necessary
@@ -47,7 +47,7 @@ if __name__ == '__main__':
 
     """ Save or display the prediction """
     pred_mask = mask_parse(pred_y)
-    save_path = f'../../data/predict/predicted/cup/{image_name}_cup.png'
+    save_path = f'../../out/predict/predicted/cup/{image_name}_cup.png'
     cv2.imwrite(save_path, pred_mask * 255)
 
     print(f"Saved predicted mask to {save_path}")

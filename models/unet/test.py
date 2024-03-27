@@ -45,11 +45,11 @@ if __name__ == '__main__':
     seeding(42)
 
     """ Create folder """
-    create_dir('../../data/results')
+    create_dir('../../out/results')
 
     """ Load dataset """
-    test_x = glob("../../data/drishti-GS/test/*/image/*.png")
-    test_y = glob("../../data/drishti-GS/test/*/mask/cup/*.png")
+    test_x = glob("../../datasets/drishti-GS/test/*/image/*.png")
+    test_y = glob("../../datasets/drishti-GS/test/*/mask/cup/*.png")
 
     """ Hyperparameters """
     H = 1024
@@ -112,7 +112,7 @@ if __name__ == '__main__':
         line = np.ones((size[1], 10, 3)) * 128
 
         cat_images = np.concatenate([image, line, ori_mask, line, pred_y * 255], axis=1)
-        cv2.imwrite(f"../../data/results/{name}.png", cat_images)
+        cv2.imwrite(f"../../out/results/{name}.png", cat_images)
 
     jaccard = metrics_score[0] / len(test_x)
     f1 = metrics_score[1] / len(test_x)
