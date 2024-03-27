@@ -106,12 +106,12 @@ def define_dataset():
         {
             "data_path": r"D:\licenta\datasets\RIM-ONE r3 - Copy",
             "config": dataset_configurations["RIM_ONE"],
-            "output_dir": "../data/rim-one-r3"
+            "output_dir": "../datasets/rim-one-r3"
         },
         {
             "data_path": r"D:\licenta\datasets\Drishti-GS - Copy",
             "config": dataset_configurations["DRISHTI_GS"],
-            "output_dir": "../data/drishti-GS"
+            "output_dir": "../datasets/drishti-GS"
         }
     ]
 
